@@ -45,7 +45,8 @@ def uploadImagesIndividu(list_box, list_name):
 def creerIndividuFenetreFermer():
     global creer_individu_fenetre, creer_individu_fenetre_open, creer_individu_fenetre_destroy
     
-    creer_individu_fenetre.destroy()
+    if creer_individu_fenetre and creer_individu_fenetre.winfo_exists():
+        creer_individu_fenetre.destroy()
     creer_individu_fenetre_open = False
     creer_individu_fenetre_destroy = True
     
@@ -77,7 +78,27 @@ def creerIndividuFenetre():
 
         boutton_valider = Button(creer_individu_fenetre, text="Ajouter", anchor="w", command=lambda: dbAjouterIndividu(boutton_input_nom.get(), boutton_input_prenom.get()))
         boutton_valider.grid(row=2, column=1)
-    creer_individu_fenetre.deiconify()
+    if not creer_individu_fenetre.winfo_exists():  # Vérifie si la fenêtre existe encore
+        creer_individu_fenetre = None
+    else:
+        creer_individu_fenetre.deiconify()
+    
+def delete_indiv(list_box, list_name):
+    is_empty = (not list_box.curselection())
+
+    if(not is_empty):
+        select = list_box.curselection()
+        individu = list_name[select[0]]
+        
+        id = individu[0]
+        delete_individu(database, id)
+        majListBox()
+        dbFenetreFermer()
+        dbInterface()
+    else:
+        messagebox.showerror("Erreur", "Veuillez selectionner une personne !")
+    
+
 
 def majListBox():
     list_box.delete(0, tk.END)
@@ -126,13 +147,19 @@ def dbInterface():
             list_box.insert('end', f"{nom} {prenom}")
         list_box.pack(pady=10)
     
-        boutton_upload_image = Button(frame_bouttons, text="Upload Images", anchor="w",  command= lambda: uploadImagesIndividu(list_box, list_name))
-        boutton_upload_image.pack(side=tk.LEFT, padx=5)
+     
         boutton_creer_individu = Button(frame_bouttons, text="Ajouter Individu", anchor="w" , command= lambda: creerIndividuFenetre())
         boutton_creer_individu.pack(side=tk.LEFT, padx=5)
 
+        boutton_upload_image = Button(frame_bouttons, text="Upload Images", anchor="w",  command= lambda: uploadImagesIndividu(list_box, list_name))
+        boutton_upload_image.pack(side=tk.LEFT, padx=5)
+
         boutton_image_encoder = Button(frame_bouttons, text="Encodage", anchor="w", command= lambda: encode_tout())
         boutton_image_encoder.pack(side=tk.LEFT, padx=5)
+
+            # button supprimer a mettre en desous les autres btns 
+        boutton_supprimer = Button(frame_bouttons, text="Supprimer", anchor="w", command= lambda: delete_indiv(list_box, list_name))
+        boutton_supprimer.pack(side=tk.LEFT, padx=5)
 
     db_fenetre.deiconify()
 

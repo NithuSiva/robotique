@@ -50,6 +50,21 @@ def insert_into_images(database, imgs):
     except sqlite3.Error as e:
         print("err insert image :", e)
 
+def delete_individu(database, id):
+    conn = create_connection(database)
+    try: 
+        c = conn.cursor()
+        sql = "DELETE FROM individu WHERE id_individu = ?"
+        val = (id,)
+        c.execute(sql, val)
+        conn.commit()
+        print("Individu a été supprimé avec succès !")
+        c.close()
+        conn.close()
+        print("Connextion fermé !")
+    except sqlite3.Error as e:
+        print("err Delete individu :", e) 
+
 def creation_DB(database):
 
     conn = create_connection(database)
