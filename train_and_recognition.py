@@ -5,35 +5,8 @@ import os, face_recognition, pickle
 
 DEFAULT_ENCODINGS_PATH = Path("db/encoding/encodings.pkl")
 
-def encode_known_faces(path,
-    model: str = "hog", encodings_location: Path = DEFAULT_ENCODINGS_PATH
-) -> None:
-    names = []
-    encodings = []
-    folders = os.listdir(path)
-    # people = [person for person in os.listdir(path)]
-    # print(people)
-
-    for person in folders:
-        name = person.replace("_", " ") if "_" in person else person
-        person_path = path + "/" + person
-        person_files = os.listdir(person_path)
-        for img_path in person_files:
-            path_name = person_path + "/" + img_path
-            print(path_name)
-            image = face_recognition.load_image_file(path_name)
-
-            face_locations = face_recognition.face_locations(image, model=model)
-            face_encodings = face_recognition.face_encodings(image, face_locations)
-            # print(face_encodings)
-            for encoding in face_encodings:
-                names.append(name)
-                encodings.append(encoding)
-
-        name_encodings = {"names": names, "encodings": encodings}
-        with encodings_location.open(mode="wb") as f:
-            pickle.dump(name_encodings, f)
-
+# Prend en paramètres une liste d'images et un nom
+# Encode chaque image dans un fichier .plk appartenant au nom dans le dossier liste_personne
 def encode_images_faces(name, images,
     model: str = "hog") -> None:
     
@@ -42,11 +15,10 @@ def encode_images_faces(name, images,
     name = name.split(" ")
     name = name[0] + "_" + name[1]
     encodings_location: str = Path(f"db/encoding/liste_personne/{name}.plk") 
-    print(encodings_location)
-    for image_file in images:
-        print(image_file)
-        face_reco_image = face_recognition.load_image_file(image_file)
 
+    for image_file in images:
+
+        face_reco_image = face_recognition.load_image_file(image_file)
         face_locations = face_recognition.face_locations(face_reco_image, model=model)
         face_encodings = face_recognition.face_encodings(face_reco_image, face_locations)
 
@@ -62,6 +34,7 @@ def encode_images_faces(name, images,
     
     return encodings_location
 
+# Parcours le dossier liste_personne et va ajouter l'encodage de chaque fichier dans une liste afin de créer un encodage unique
 def encode_tout(encodings_location: Path = DEFAULT_ENCODINGS_PATH,
 ) -> None:
     path = Path("db/encoding/liste_personne")
@@ -86,74 +59,47 @@ def encode_tout(encodings_location: Path = DEFAULT_ENCODINGS_PATH,
             print("NO file encode.plk")
 
     names_encodings = {"names": names, "encodings": encodings}   
-    
+
     with encodings_location.open(mode="wb") as f:
         pickle.dump(names_encodings, f)
 
-
-def _recognize_face(unknown_encoding, loaded_encodings):
-
-    boolean_matches = face_recognition.compare_faces(loaded_encodings["encodings"], unknown_encoding)
-    distance = face_recognition.face_distance(loaded_encodings["encodings"], unknown_encoding)
-
-    list_distance = list(map(lambda x: round(x * 100), distance))
-    list_accuracy = list(map((lambda x: 100 - x), list_distance))
-    list_validation = list(
-        map((lambda ac: True if ac >= 40 else False),list_accuracy))
-    print("Boolean matches", boolean_matches)
-    print("List accuracy", list_accuracy)
-    print("List validation", list_validation)
-    votes = Counter(    
-        name
-        for match, name in zip(list_validation, loaded_encodings["names"])
-        if match
-    )
-    print("votes", votes)
-    if votes:
-        return votes.most_common(1)[0][0]
-    
-
+# Fonction qui va comparé la frame de la caméra avec le fichier d'encodage
 def _recognize_face_video(unknown_encoding, loaded_encodings):
     unknown_encoding = np.array(unknown_encoding)
     boolean_matches = face_recognition.compare_faces(
         loaded_encodings["encodings"], unknown_encoding
     )
+    # Distance qui renvoie la difference de caracterstique entre la frame et chaque données de visage stocké dans l'encodage
     distance = face_recognition.face_distance(loaded_encodings["encodings"], unknown_encoding)
-    
     list_distance = list(map(lambda x: round(x * 100), distance))
-    list_accuracy = list(map((lambda x: 100 - x), list_distance))
+
+    # Calcul la précision entre la frame et chaque données de visage stocké dans l'encodage
+    list_precision = list(map((lambda x: 100 - x), list_distance))
+
+    # Créer une liste qui pour chaque précision du visage dans l'encodage, est vrai si il est strictement supérieur à 50
+    # sinon faux
     list_validation = list(
-        map((lambda ac: True if ac >= 50 else False),list_accuracy))
+        map((lambda ac: True if ac >= 50 else False),list_precision))
     
-    votes = Counter(
-        name
-        for match, name in zip(list_validation, loaded_encodings["names"])
-        if match
-    )
-    if votes:
-        return votes.most_common(1)[0][0]
+    # Créer un dictionnaire des noms présent dans l'encodage
+    name_precision = {name: [] for name in loaded_encodings["names"]}
 
+    # Associer chaque precision à son nom correspondant
+    for precision, name, is_valid in zip(list_precision,
+                                        loaded_encodings["names"],
+                                        list_validation):
+        if is_valid:
+            name_precision[name].append(precision)
+            
+    # Calculer la moyenne des précision pour chaque nom
+    moyenne_precisions = {name: sum(accuracies) / len(accuracies) for name, accuracies in name_precision.items() if accuracies}
 
-def recognize_faces(
-    image_location: str,
-    model: str = "hog",
-    encodings_location: Path = DEFAULT_ENCODINGS_PATH,
-) -> None:
-    with encodings_location.open(mode="rb") as f:
-        loaded_encodings = pickle.load(f)
+    if moyenne_precisions:
+        return  list(moyenne_precisions.items())[0]
+    else:
+        return ('Inconnu', '?')
 
-    input_image = face_recognition.load_image_file(image_location)
-    input_face_locations = face_recognition.face_locations(input_image, model=model)
-    input_face_encodings = face_recognition.face_encodings(input_image, input_face_locations)
-
-    for bounding_box, unknown_encoding in zip(input_face_locations, input_face_encodings):
-        name = _recognize_face(unknown_encoding, loaded_encodings)
-        print(name)
-        if not name:
-            name = "Unknown"
-        return [name, bounding_box]
-
-
+# Fonction chapeau qui va appelé la fonction _recognize_face_video, il retourne soit le visage reconnu soit 'Inconnu'
 def recognize_faces_video(im,
     encodings_location: Path = DEFAULT_ENCODINGS_PATH,
 ) -> None:
@@ -164,16 +110,4 @@ def recognize_faces_video(im,
 
     for unknown_encoding in zip(face_encodings):
         name = _recognize_face_video(unknown_encoding, loaded_encodings)
-        if not name:
-            name = "Unknown"
         return name
-
-
-# Training and encode
-
-# encode_known_faces("db/training_images")
-
-# Test 
-
-# name, faces = recognize_faces("C:/Users/Ni2/Documents/M1_git/robotique/db/test/asiat1.jpg")
-# print(name, faces)
