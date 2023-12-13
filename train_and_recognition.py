@@ -25,6 +25,7 @@ def encode_known_faces(path,
 
             face_locations = face_recognition.face_locations(image, model=model)
             face_encodings = face_recognition.face_encodings(image, face_locations)
+            # print(face_encodings)
             for encoding in face_encodings:
                 names.append(name)
                 encodings.append(encoding)
@@ -52,11 +53,9 @@ def encode_images_faces(name, images,
         #Normalement 1 seul visage sur l'image donc pas necessaire le for
         for encoding in face_encodings:
             names.append(name)
-            encodings.append(encodings)
+            encodings.append(encoding)
         
     names_encodings = {"names": names, "encodings": encodings}
-    for enc in names_encodings['encodings']:
-        print(enc)
 
     with encodings_location.open(mode="wb") as f:
         pickle.dump(names_encodings, f)
@@ -67,14 +66,29 @@ def encode_tout(encodings_location: Path = DEFAULT_ENCODINGS_PATH,
 ) -> None:
     path = Path("db/encoding/liste_personne")
     liste_personne = os.listdir(path)
-    print(liste_personne)
-    print(path)
+    names = []
+    encodings = []
+
     for personne in liste_personne:
-        path_personne = str(path) + '/' + str(personne)
-    with encodings_location.open(mode="rb") as f:
-        loaded_encodings = pickle.load(f)
-       
-       
+        path_personne = Path(str(path) + '/' + str(personne))
+        print(path_personne)
+        
+        if(os.path.isfile(path_personne)):
+            with path_personne.open(mode="rb") as f:
+                loaded_encodings = pickle.load(f)
+                print(loaded_encodings['names'])
+                for name in loaded_encodings['names']:
+                    names.append(name)
+                for encode in loaded_encodings['encodings']:
+                    encodings.append(encode)
+
+        else:
+            print("NO file encode.plk")
+
+    names_encodings = {"names": names, "encodings": encodings}   
+    
+    with encodings_location.open(mode="wb") as f:
+        pickle.dump(names_encodings, f)
 
 
 def _recognize_face(unknown_encoding, loaded_encodings):

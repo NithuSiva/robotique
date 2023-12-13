@@ -3,8 +3,6 @@ import sys
 sys.path.insert(1, 'db')
 
 from db2 import *
-
-
 import tkinter as tk    
 from tkinter import *
 from tkinter import ttk

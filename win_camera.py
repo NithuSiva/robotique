@@ -2,8 +2,6 @@ import cv2, face_recognition
 from datetime import datetime
 from train_and_recognition import *
 
-import threading
-
 def rec_fac():
 	(width, height) = (10, 10)	 
 
@@ -35,7 +33,7 @@ def rec_fac():
 			face = gray[y:y + h, x:x + w] 
 			face_resize = cv2.resize(face, (width, height)) 
 			font = cv2.FONT_HERSHEY_DUPLEX
-			cv2.putText(im, name, (x + 6, w - 6), font, 1.0, (255, 255, 255), 1)
+			cv2.putText(im, name, (x + 6, y - 6), font, 1.0, (255, 255, 255), 1)
 		
 		
 		cv2.imshow('OpenCV', im)
