@@ -99,7 +99,6 @@ def _recognize_face(unknown_encoding, loaded_encodings):
         return votes.most_common(1)[0][0]
     
 
-
 def _recognize_face_video(unknown_encoding, loaded_encodings):
     unknown_encoding = np.array(unknown_encoding)
     boolean_matches = face_recognition.compare_faces(

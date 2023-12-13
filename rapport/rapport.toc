@@ -1,0 +1,27 @@
+\contentsline {part}{I\hspace {1em}Introduction}{2}{}%
+\contentsline {section}{\numberline {1}Contexte}{2}{}%
+\contentsline {section}{\numberline {2}Objectifs}{2}{}%
+\contentsline {section}{\numberline {3}Definitions}{2}{}%
+\contentsline {subsection}{\numberline {3.1}Reconnaissance faciale}{2}{}%
+\contentsline {subsection}{\numberline {3.2}Raspberry Pi}{2}{}%
+\contentsline {subsection}{\numberline {3.3}XML}{2}{}%
+\contentsline {part}{II\hspace {1em}Recherche}{2}{}%
+\contentsline {section}{\numberline {4}Environnement}{2}{}%
+\contentsline {section}{\numberline {5}Bibliothèques}{3}{}%
+\contentsline {section}{\numberline {6}Reconnaissance faciale}{3}{}%
+\contentsline {subsection}{\numberline {6.1}Détection du visage}{3}{}%
+\contentsline {subsection}{\numberline {6.2}Reconnaissance d'un individu}{3}{}%
+\contentsline {section}{\numberline {7}Algorithme}{5}{}%
+\contentsline {subsection}{\numberline {7.1}Haar Cascade}{5}{}%
+\contentsline {part}{III\hspace {1em}Developpement}{5}{}%
+\contentsline {section}{\numberline {8}Materiels}{6}{}%
+\contentsline {subsection}{\numberline {8.1}Installation}{6}{}%
+\contentsline {subsection}{\numberline {8.2}Configuration}{6}{}%
+\contentsline {section}{\numberline {9}Reconnaissance Faciale}{7}{}%
+\contentsline {subsection}{\numberline {9.1}Détection du visage avec la caméra Pi}{8}{}%
+\contentsline {subsection}{\numberline {9.2}Reconnaissance faciale}{9}{}%
+\contentsline {section}{\numberline {10}Base de données}{10}{}%
+\contentsline {subsection}{\numberline {10.1}Encodage des données des individus}{10}{}%
+\contentsline {part}{IV\hspace {1em}Résultats}{10}{}%
+\contentsline {section}{\numberline {11}Analyse des résultats}{10}{}%
+\contentsline {part}{V\hspace {1em}Conclusion}{10}{}%

@@ -1,5 +1,8 @@
 {
     "python.analysis.extraPaths": [
         "./db"
-    ]
+    ],
+    "latex-workshop.latex.rootFile": "${workspaceFolder}/rapport/rapport.tex",
+    "cSpell.language": "fr",
+
 }

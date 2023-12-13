@@ -25,9 +25,9 @@ while True:
         # Detect the faces
         faces = face_cascade.detectMultiScale(gray, 1.1, 4)
         # Draw the rectangle around each face
-        #for (x, y, w, h) in faces:
-        #    cv2.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 2)
-        #    cv2.putText(image, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36,255,12), 2)
+        for (x, y, w, h) in faces:
+           cv2.rectangle(image, (x, y), (x+w, y+h), (255, 0, 0), 2)
+           cv2.putText(image, name, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36,255,12), 2)
         # Display
         
         cv2.imshow("Press", image)
